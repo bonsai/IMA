@@ -28,3 +28,7 @@ This directory contains Architecture Decision Records (ADRs) for the SmartIME pr
 | [Adr0021](Adr0021_CSharpWpfUiForConfiguration.md) | **C# UI for Configuration**<br>`Proposed` | Windows向け設定UIにC# (WPF)を採用。RustコアとはFFI (P/Invoke)で連携し、UI開発の生産性とパフォーマンスを両立する。 |
 | [Adr0022](Adr0022_DatabaseSelectionForPersonalDelta.md) | **Database for Personal Delta**<br>`Proposed` | 個人学習データ(Personal Delta)の永続化にSQLite、高速キャッシュに純Rust製KVストア(redb)を併用するハイブリッド戦略を採用。 |
 | [Adr0023](Adr0023_MlStrategyForIntentClassification.md) | **ML Strategy for Classification**<br>`Proposed` | 意図分類のML戦略として、形態素解析に純Rust製・高速な「Vibrato」、推論エンジンに純Rust製ONNXランタイム「Tract」を採用する。 |
+| [Adr0024](Adr0024_WordPrediction.md) | **Word and Phrase Prediction**<br>`Proposed` | Personal DeltaのN-gramとTrieを活用したリアルタイム単語・フレーズ予測。ゴーストテキストで非侵襲的に提案し、Tabキーで確定。自動確定は禁止。 |
+| [Adr0025](Adr0025_LatentIntentInference.md) | **Latent Intent Inference**<br>`Proposed` | 確定テキストからURLや住所・日付などのエンティティを検出し、「次に取りうる行動」を隠れ意図として推論・提示する。パターンマッチング主体で軽量実装。 |
+| [Adr0026](Adr0026_SpeakerClustering.md) | **Speaker Clustering**<br>`Proposed` | アクティブなアプリケーション（VSCode/Slack/Outlookなど）を文脈として検出し、用途別の統計ペルソナ（重み付けレイヤー）を自動切替。完全オフラインで話者スタイルに適応。 |
+| [Adr0027](Adr0027_AsrInspiredPipeline.md) | **ASR-Inspired Text Input Pipeline**<br>`Proposed` | 音声認識（ASR）の「信号受理→言語識別→デコード→リスコアリング」パイプラインをキーボード入力に転用。ローマ字バッファ→判別→処理→補正の4段構造を正式に定義。 |
