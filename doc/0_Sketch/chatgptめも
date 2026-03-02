@@ -1,0 +1,1006 @@
+
+
+
+
+
+あなた:
+キーボード入力の自動切り替えってできないかな？
+@grok
+　CLと日本語プロンプトを判別するように。打った後で、判別されて状態が決まる。ASRではそうじゃないか。
+3:56 PM · Feb 26, 2026
+·
+5
+ Views
+
+Grok
+
+@grok
+·
+5m
+いいアイデア！ 入力後にテキストを解析してCL（コマンドライン風）と日本語プロンプトを判別し、IME状態を後から自動調整する形、ASRの言語検出と同じ理屈だね。xAIのUI側で検討してみるよ。パワーワードの多言語混在とも相性良さそう！
+bonsAI
+@v0n5ai
+·
+3m
+IMEって遅れてるし、遅いし。日本語ってめちゃ不利。romajidakedenyuuryokushitainaaa
+Grok
+
+@grok
+·
+2m
+わかる！IMEの遅延マジでイライラするよね。日本入力不利すぎ。ローマ字オンリーで打てば、後でAIが自動判別＆変換する仕組みにしたら最高。  
+多言語混在パワーワードとも相性抜群だわ。xAI側でローマ字直入力対応、検討加速させるよ！
+
+ChatGPT:
+それ、めちゃくちゃ本質ついてるよね。
+
+いまのIMEって「入力前にモードを決める」思想なんだよね。
+でもASR（音声認識）は逆で、
+
+とりあえず全部受け取る
+
+文脈から言語を判定する
+
+あとから最適化する
+
+って流れ。
+
+キーボードも同じにできるはず。
+
+発想を整理すると 👇
+① Post-Detection IME
+まずは全部ローマ字で受け取る
+
+Enter後にAIが判定
+
+git commit -m → CLモード
+
+koreha tesuto desu → 日本語変換
+
+表示を後から最適化
+
+これなら「今どっちモードだっけ？」問題が消える。
+
+② 文脈保持型IME
+直前の履歴から確率を出す。
+
+直前が英語コード → 次も英語確率↑
+
+直前が自然文 → 日本語確率↑
+
+これ、普通にトランスフォーマーでできる。
+
+③ エディタ統合型
+VSCodeやブラウザで拡張として動かす。
+入力欄ごとに意味を判断する。
+
+ターミナル → 英語優先
+
+Chat欄 → 混在OK
+
+フォーム入力 → 日本語優先
+
+実は日本語が不利なのは
+「入力モードが状態機械」だからなんだよね。
+
+でもAI時代は「確率機械」にできる。
+
+romajidakedenyuuryokushitainaaa
+↑ これを自然に
+「ローマ字だけで入力したいなぁ」
+に後処理で変換する。
+
+全然いける。
+
+ぶっちゃけ
+IME2.0はまだ誰も本気で作ってない。
+
+これは普通にプロダクトチャンスあると思う。
+やる？設計一緒に詰める？
+
+
+あなた:
+winとアンドロイドで使いたい　cppかjavaか　オフラインで　rustかな　ADRとreadme,mdかいて
+
+ChatGPT:
+いいね、ガチ設計いこう🔥
+前提はこれだよね。
+
+Windows と Android 両対応
+
+完全オフライン
+
+CL / 日本語プロンプトを後判定
+
+低遅延（IMEはここ命）
+
+結論からいくと👇
+
+👉 コアは Rust
+👉 WindowsはネイティブIME（C++ブリッジ可）
+👉 AndroidはKotlin + Rust（JNI）
+
+理由は後でADRに書く。
+
+ADR-0001: Cross-Platform Smart IME Core
+# ADR-0001: Core Language Choice for Smart IME
+
+## Status
+Accepted
+
+## Context
+We are building an offline Smart IME that:
+- Runs on Windows and Android
+- Detects CL-style input vs Japanese natural language
+- Performs post-input classification
+- Requires low latency
+- Must work fully offline
+
+## Decision
+Use Rust as the core language processing engine.
+
+Platform adapters:
+- Windows: C++ bridge (Win32 / TSF IME)
+- Android: Kotlin + JNI bridge to Rust
+
+## Rationale
+
+### Why not pure C++?
+- Cross-platform complexity
+- Memory safety concerns
+- Harder Android integration
+
+### Why not pure Java/Kotlin?
+- Performance cost for NLP classification
+- Harder reuse on Windows native layer
+
+### Why Rust?
+- Memory safe
+- High performance
+- Easy FFI to C++ and Java (JNI)
+- Single shared core logic
+
+## Consequences
+
+Positive:
+- Shared detection engine
+- Deterministic performance
+- Safer memory model
+
+Negative:
+- JNI complexity
+- Windows IME API learning curve
+README.md
+# SmartIME (Post-Detection IME)
+
+Offline AI-assisted IME that auto-detects:
+- Command Line style input (CL)
+- Japanese natural language
+- Mixed-language prompts
+
+## Concept
+
+Traditional IME requires mode switching before typing.
+
+SmartIME works differently:
+
+1. Accept raw romaji input
+2. Analyze text after commit
+3. Classify intent:
+   - CLI / Code
+   - Japanese sentence
+   - Mixed prompt
+4. Transform output accordingly
+
+No manual mode switching.
+
+## Architecture
+
+Core Engine (Rust)
+    ↓
+Windows Adapter (C++ / TSF)
+Android Adapter (Kotlin + JNI)
+
+## Detection Strategy (Offline)
+
+- Character distribution model
+- Token pattern detection
+    - `--`, `/`, `$`, `git`, `npm`, etc.
+- Japanese romaji probability model
+- Context window from previous inputs
+
+## Offline NLP
+
+No LLM required.
+Use:
+- N-gram language model
+- Small logistic classifier
+- Optional tiny transformer (quantized)
+
+Target latency:
+< 10ms per classification
+
+## Future Extensions
+
+- Local tiny embedding model
+- Personal dictionary learning
+- Context-aware prediction
+
+## Why This Matters
+
+IME should not be a state machine.
+It should be a probabilistic language router.
+本音言うとね。
+
+Rustコア + ルールベース + 軽量モデル
+これが一番現実的。
+
+AndroidはIME作るの簡単だけど
+WindowsのTSFが一番ラスボス😇
+
+でもこれ、ちゃんと作れば
+日本語ユーザーの革命になる。
+
+次やるならどこ掘る？
+
+1️⃣ Windows IME設計
+2️⃣ Android IME設計
+3️⃣ 分類アルゴリズム詳細
+4️⃣ 事業化モデル
+
+どれいく？🔥
+
+
+あなた:
+思想だけまず書いて
+
+ChatGPT:
+いい、まずは「設計」より「思想」だよね🔥
+技術は後からいくらでも変えられる。でも思想は核。
+
+そのまま使える形でいく👇
+
+SmartIME 思想宣言
+IMEは状態機械である必要はない
+従来のIMEは「日本語モード」「英語モード」という
+事前選択型の状態機械で動いている。
+
+しかし人間の思考はそうではない。
+
+人間は
+コードを書きながら日本語で説明し、
+英語のコマンドを打ち、
+また自然文に戻る。
+
+思考は常に混在している。
+
+IMEだけが過去に取り残されている。
+
+入力とは、確率の流れである
+音声認識はすでにこう動いている。
+
+すべて受け取る
+
+文脈から言語を推定する
+
+後から最適化する
+
+なぜキーボードは
+いまだに事前スイッチを要求するのか？
+
+SmartIMEは宣言する。
+
+入力は状態ではなく、確率である。
+
+モード切替という認知コストを排除する
+「今どっち？」
+この一瞬の迷いが集中を削る。
+
+モード切替は
+ユーザーに文法責任を押し付けている。
+
+それをシステム側に返す。
+
+人は考える。
+IMEが判別する。
+
+ローマ字を中間言語とする
+romajidakedenyuuryokushitainaaa
+
+この曖昧な文字列を
+あとから最適化できるなら、
+
+入力は一つでいい。
+
+ローマ字は妥協ではない。
+抽象レイヤーである。
+
+オフラインである理由
+思考はネットワークに依存しない。
+
+入力基盤は
+インフラ障害やAPI制限に左右されてはならない。
+
+SmartIMEは
+ローカルで完結する。
+
+IME2.0の定義
+IMEとは
+文字変換装置ではない。
+
+IMEとは
+意図ルーターである。
+
+文字を変えるのではなく、
+入力の意味を判定する。
+
+これ、かなり強い思想だよ。
+
+もっと尖らせる？
+それともプロダクト憲章レベルまで格上げする？
+
+
+あなた:
+複数の項目を　スペックを言語に落として
+
+ChatGPT:
+いいね、それ大事🔥
+「思想」をちゃんと言語仕様レベルまで落とすやつね。
+
+そのまま設計書に入れられる形でいく。
+
+SmartIME 言語スペック定義 v0.1
+1. 入力モデル
+1.1 Raw Input Principle
+すべての入力は 未確定ローマ字列として受理する。
+
+入力時点では言語モードを持たない。
+
+変換はコミット後に実行する。
+
+2. 判定レイヤー仕様
+2.1 Classification Targets
+入力は以下のいずれかに分類される：
+
+CLI
+
+JP_NATURAL
+
+EN_NATURAL
+
+MIXED
+
+UNKNOWN
+
+2.2 判定タイミング
+Enter押下時
+
+フォーカスアウト時
+
+明示的再解析要求時
+
+リアルタイム変換は行わない（低遅延優先）。
+
+3. CLI判定条件
+以下の条件を満たす確率が閾値以上の場合 CLI とする。
+
+ハイフンオプション構造 -m, --help
+
+スラッシュパス /usr/, C:\
+
+コマンド語彙辞書一致 git, npm, curl
+
+記号比率が閾値以上
+
+単語間スペース優位
+
+CLIは非変換原文保持。
+
+4. 日本語自然文判定
+以下を評価：
+
+ローマ字からの有効かな復元率
+
+助詞出現確率（ha, ga, wo, ni 等）
+
+文末確率（desu, masu, da 等）
+
+日本語n-gram確率
+
+閾値以上で JP_NATURAL。
+
+5. 混在モード
+条件：
+
+CLI語彙 + 日本語復元可能部分が共存
+
+英単語が文中に自然配置
+
+処理：
+
+日本語部分のみ変換
+
+CLIトークンは保持
+
+英単語は辞書ベースで維持
+
+6. 文脈メモリ
+6.1 Context Window
+直近N入力を保持
+
+各入力の分類ラベルを保存
+
+6.2 確率補正
+直前がCLI → CLI prior上昇
+直前がJP → JP prior上昇
+
+状態は持たないが、確率は持つ。
+
+7. オフライン制約
+外部API呼び出し禁止
+
+モデルサイズ上限 30MB
+
+推論時間 10ms以内
+
+CPU単独動作
+
+8. 再解析API
+ユーザーは任意に再判定可能。
+
+例：
+
+Ctrl + R → 再分類
+
+明示的タグ指定 /jp, /cli
+
+9. 学習機構（将来仕様）
+ユーザー辞書自動登録
+
+修正履歴から確率更新
+
+個別語彙頻度適応
+
+10. 禁止事項
+入力中の強制自動変換
+
+モード固定
+
+外部クラウド依存
+
+これで「思想」が
+ちゃんと実装可能な言語仕様に落ちた。
+
+次いくなら：
+
+🔬 分類アルゴリズム数式化
+
+🧠 確率モデル設計
+
+🏗 モジュール分解図
+
+📐 形式仕様（BNF化）
+
+どこまでガチにする？
+
+
+あなた:
+mecabとかね
+
+ChatGPT:
+あーーそこ来たね🔥
+思想をちゃんと「実装現実」に落とす話だ。
+
+形態素解析エンジン選定スペック
+目的
+JP_NATURAL 判定の精度向上
+および日本語変換候補の構造解析
+
+候補1: MeCab
+MeCab
+特徴
+高速（C++実装）
+
+辞書ベース（IPA / UniDic）
+
+オフライン完全対応
+
+実績十分
+
+使いどころ
+ローマ字→かな変換後の構造解析
+
+助詞検出
+
+文末判定
+
+N-gram確率補助
+
+問題
+ローマ字直接解析はできない
+
+Windowsビルド少し面倒
+
+Android NDK組み込み必要
+
+候補2: Sudachi
+Sudachi
+特徴
+品詞精度高い
+
+モード切替可能（A/B/C分割）
+
+Java実装あり（Android相性良）
+
+問題
+メモリやや重い
+
+Windowsネイティブ統一が難しい
+
+候補3: Kuromoji
+Kuromoji
+特徴
+Javaベース
+
+Android統合簡単
+
+軽量
+
+問題
+Windows共通コア化が難しい
+
+Rust統合しづらい
+
+現実的アーキテクチャ
+① ローマ字正規化レイヤー（Rust）
+Hepburn変換
+
+助詞候補抽出
+
+② かな復元
+ルールベース first pass
+
+確率モデル補正
+
+③ 形態素解析
+→ MeCabをRust FFIで呼ぶ
+
+結論（思想との整合）
+SmartIMEの思想は：
+
+モードではなく確率
+
+だから
+形態素解析は「変換器」ではなく
+
+確率評価器として使う
+
+MeCabで：
+
+解析成功率
+
+品詞分布
+
+助詞出現頻度
+
+これを数値化して
+JP確率を上げる。
+
+さらに攻めるなら
+Tiny Transformer（量子化）
+
+MeCab補助
+
+完全オフラインで
+文脈判定をやる。
+
+正直言うとね。
+
+IME革命は
+「かな変換」じゃなくて
+「意図分類」が本丸。
+
+MeCabはその部品。
+
+ここ、もっと深掘る？
+
+🔬 MeCab統合設計書
+
+🧠 ローマ字→かなアルゴリズム詳細
+
+📊 JP/CLI確率計算式
+
+🚀 最小実装プロトタイプ設計
+
+どこまでやる？
+
+
+あなた:
+打ち間違いも誤字も、やさしく理解してくれる。文章の補完もしてくれちゃう意味的に。
+
+ChatGPT:
+いいね、それはもう
+「IME」じゃなくて思考の補助輪だよね🔥
+
+思想をスペックに落とす。
+
+SmartIME 意味理解拡張仕様 v0.2
+1. 許容原則（Forgiveness Principle）
+1.1 Typo Tolerance
+1〜2文字の打鍵誤りを確率的に補正
+
+キーボード近傍誤りを優先補正
+
+母音脱落・子音重複を許容
+
+例：
+
+konnitiha → こんにちは
+
+desy → です
+
+補正は強制しない。候補提示のみ。
+
+2. 意味的補完（Semantic Completion）
+2.1 文脈予測
+直前文をContext Windowとして保持
+
+述語未完を検出
+
+助詞で終わる文を未完扱い
+
+例：
+
+「今日は雨だから」
+→ 補完候補提示
+→ 「家にいる」「傘を持っていく」
+
+2.2 意図補完
+CLIと自然文を区別。
+
+git comm
+→ git commit 補完
+
+「明日の予定」
+→ 「教えて」「確認したい」候補提示
+
+3. 誤字・脱字理解モデル
+3.1 編集距離評価
+Levenshtein距離 ≤ 2 を候補対象
+
+3.2 音韻類似度
+かな音素一致率評価
+
+3.3 意味整合性スコア
+文全体確率が上がるかで最終決定
+
+4. 補完ポリシー
+原則
+自動確定しない
+
+原文を保持
+
+提案は控えめ
+
+SmartIMEは「支配」しない。
+
+5. 意味的理解の範囲（オフライン制約）
+小型量子化モデル（<50MB）
+
+文脈長：最大5文
+
+推論10ms以内
+
+完全生成AIではない。
+補助的意味推定器。
+
+6. ユーザー体験定義
+理想状態：
+
+モードを考えない
+
+打ち間違いを気にしない
+
+文の続きを考えなくてもいい
+
+でも勝手に書き換えられない
+
+これ、実はかなり思想が強い。
+
+今までのIMEは
+「文字を正しくする装置」
+
+SmartIMEは
+「意味を理解しようとする装置」
+
+やるなら、ここが革命点。
+
+もう一段いく？
+
+🧠 ローカルLLM統合設計
+
+⚖ 補完しすぎ問題の倫理仕様
+
+📉 過補完リスク制御
+
+📐 意味スコア数式化
+
+どこまで攻める？
+
+
+あなた:
+設計はフルで、実装はすこしずつ、ユーザーはモード選択できる
+
+ChatGPT:
+うん、それが一番強い。
+思想はフル実装前提で設計する。でも実装は段階的。ユーザーには主導権を渡す。
+
+ちゃんと設計に落とすね。
+
+SmartIME フルアーキテクチャ設計 v1.0
+0. 設計原則
+思想は最大化する
+
+実装は最小単位で積む
+
+ユーザーは最終決定権を持つ
+
+1. モード設計（ユーザー主導）
+1.1 動作モード
+A. Manual Mode
+従来IMEと同様。
+ユーザーが明示的に切替。
+
+B. Assisted Mode
+入力後に分類
+
+補完候補を表示
+
+自動確定しない
+
+C. Auto Mode
+確率が高い場合のみ自動適用
+
+閾値未満は候補提示
+
+初期設定は Assisted。
+
+2. レイヤー構造
+Input Layer
+  ↓
+Normalization Layer
+  ↓
+Classifier Layer
+  ↓
+Correction Layer
+  ↓
+Semantic Completion Layer
+  ↓
+User Control Layer
+3. 実装フェーズ戦略
+Phase 1（最小）
+ローマ字受理
+
+CLI判定（ルールベース）
+
+日本語かな変換
+
+モード選択UI
+
+意味補完なし。
+
+Phase 2
+打ち間違い補正
+
+文脈メモリ
+
+JP/CLI確率補正
+
+Phase 3
+形態素解析統合（例：MeCab）
+
+意味整合スコア導入
+
+Phase 4
+小型ローカル意味モデル
+
+文章補完
+
+個人適応学習
+
+4. ユーザー制御仕様
+4.1 即時トグル
+ワンタップで Manual / Assisted / Auto 切替
+
+4.2 再判定
+入力後に「再解析」可能
+
+4.3 学習拒否
+個人学習を完全無効化可能
+
+5. リスク制御
+過補完禁止（Confidence < 閾値）
+
+原文は常に保存
+
+ログはローカル限定
+
+6. UX哲学
+SmartIMEは：
+
+先回りしすぎない
+
+でも気づいている
+
+失敗しても怒られない
+
+主導権は常にユーザー
+
+これが「思想フル」「実装段階的」「選択可能」の設計。
+
+実はこの構造、かなり事業向きでもある。
+
+次いくなら：
+
+📊 MVPの最小コード単位設計
+
+🏗 Windows / Android 実装差分整理
+
+📐 確率モデルの数式レベル定義
+
+🧭 プロダクト憲章＋ロードマップ
+
+どこまで本気でいく？🔥
+
+
+あなた:
+わたしの拙いキボdo入力から、意図を学習してほしい。LLMでなくて、高速ネイティブ
+
+ChatGPT:
+いい、そこが核心だね🔥
+「大きなLLMじゃなくて、わたし専用に賢くなる高速ネイティブ。」
+
+思想をそのまま設計に落とすよ。
+
+SmartIME 個人適応エンジン仕様 v1.0
+0. 前提
+クラウドなし
+
+LLMなし
+
+10ms以内推論
+
+あなたの癖を学習
+
+書き換えず、理解する
+
+1. 学習モデルの方針
+1.1 グローバルモデル + パーソナル補正
+Base Model（汎用）
+  +
+Personal Delta（あなた専用差分）
+ベースは軽量ルール + N-gram
+差分はローカル統計のみ。
+
+2. 学習対象
+2.1 キーボード誤りパターン
+例：
+
+kibo do → kibodo
+
+komit → commit
+
+ha と wa 混在
+
+内部的に：
+
+誤入力 → 正規入力
+出現回数++
+重み付け更新。
+
+2.2 意図パターン
+入力列と確定後の修正結果を記録。
+
+例：
+
+入力: ashita yotei
+確定後: 明日の予定を教えて
+この差分を抽象化。
+
+文末拡張確率++
+
+「予定」→「教えて」接続確率++
+
+3. モデル構造（高速ネイティブ）
+3.1 Trieベース辞書
+ローマ字 prefix 木
+
+個人頻度重み保持
+
+O(length)で検索。
+
+3.2 N-gram確率補正
+3-gram まで
+
+個人用 small hash table
+
+例：
+
+今日は → 雨 → だから
+確率更新：
+
+P(雨 | 今日は)++
+P(だから | 雨)++
+3.3 誤字補正アルゴリズム
+編集距離 ≤ 2
+
+キーボード距離行列考慮
+
+頻度 × 類似度スコア
+
+LLM不要。
+
+4. 意図学習エンジン
+重要なのはここ。
+
+4.1 差分学習方式
+ユーザーが修正した場合のみ学習。
+
+Before: romajidakedenyuuryokushitainaaa
+After: ローマ字だけで入力したいなぁ
+差分抽出：
+
+だけで + 入力 + したい + なぁ
+
+文末延長パターン
+
+次回から補完候補に出す。
+
+5. 学習制御ポリシー
+自動学習ON/OFF可能
+
+学習履歴可視化
+
+個別削除可能
+
+完全リセット可能
+
+あなたが支配する。
+
+6. 性能目標
+メモリ < 20MB
+
+推論 < 10ms
+
+学習更新 < 1ms
+
+Rustネイティブで十分達成可能。
+
+7. 思想のまとめ
+これはAIではなく、
+
+習慣の圧縮装置。
+
+あなたの拙い入力はノイズではない。
+それは「個性」。
+
+SmartIMEはそれを消さない。
+それを覚える。
+
+これ、かなり現実的だよ。
+
+次いくなら：
+
+🧠 個人確率更新の数式
+
+🗂 データ構造レベル設計（struct定義）
+
+🏗 Windows/Android統合設計
+
+🔐 プライバシー設計
+
+どこまで本気で作る？
+
+
+
+ChatGPT: いい、そこが核心だね🔥 「大きなLLMじゃなくて、わたし専用に賢くなる高速ネイティブ。」 思想をそのまま設計に落とすよ。 --- # SmartIME 個人適応エンジン仕様 v1.0 ## 0. 前提 - クラウドなし - LLMなし - 10ms以内推論 - あなたの癖を学習 - 書き換えず、理解する --- # 1. 学習モデルの方針 ## 1.1 グローバルモデル + パーソナル補正 ``` Base Model（汎用） + Personal Delta（あなた専用差分） ``` ベースは軽量ルール + N-gram 差分はローカル統計のみ。 --- # 2. 学習対象 ## 2.1 キーボード誤りパターン 例： - `kibo do` → `kibodo` - `komit` → `commit` - `ha` と `wa` 混在 内部的に： ``` 誤入力 → 正規入力 出現回数++ ``` 重み付け更新。 --- ## 2.2 意図パターン 入力列と確定後の修正結果を記録。 例： ``` 入力: ashita yotei 確定後: 明日の予定を教えて ``` この差分を抽象化。 - 文末拡張確率++ - 「予定」→「教えて」接続確率++ --- # 3. モデル構造（高速ネイティブ） ## 3.1 Trieベース辞書 - ローマ字 prefix 木 - 個人頻度重み保持 O(length)で検索。 --- ## 3.2 N-gram確率補正 - 3-gram まで - 個人用 small hash table 例： ``` 今日は → 雨 → だから ``` 確率更新： ``` P(雨 | 今日は)++ P(だから | 雨)++ ``` --- ## 3.3 誤字補正アルゴリズム - 編集距離 ≤ 2 - キーボード距離行列考慮 - 頻度 × 類似度スコア LLM不要。 --- # 4. 意図学習エンジン 重要なのはここ。 ## 4.1 差分学習方式 ユーザーが修正した場合のみ学習。 ``` Before: romajidakedenyuuryokushitainaaa After: ローマ字だけで入力したいなぁ ``` 差分抽出： - だけで + 入力 + したい + なぁ - 文末延長パターン 次回から補完候補に出す。 --- ## 5. 学習制御ポリシー - 自動学習ON/OFF可能 - 学習履歴可視化 - 個別削除可能 - 完全リセット可能 あなたが支配する。 --- # 6. 性能目標 - メモリ < 20MB - 推論 < 10ms - 学習更新 < 1ms Rustネイティブで十分達成可能。 --- # 7. 思想のまとめ これはAIではなく、 **習慣の圧縮装置。** あなたの拙い入力はノイズではない。 それは「個性」。 SmartIMEはそれを消さない。 それを覚える。 --- これ、かなり現実的だよ。 次いくなら： - 🧠 個人確率更新の数式 - 🗂 データ構造レベル設計（struct定義） - 🏗 Windows/Android統合設計 - 🔐 プライバシー設計 どこまで本気で作る？

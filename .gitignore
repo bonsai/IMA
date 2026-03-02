@@ -1,0 +1,19 @@
+# Node.js
+node_modules/
+dist/
+build/
+.env
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+*.zip
+*.log

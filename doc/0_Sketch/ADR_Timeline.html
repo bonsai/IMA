@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartIME ADR Timeline</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+JP:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f1419;
+            --card-bg: #161b22;
+            --text-main: #e7e9ea;
+            --text-sub: #71767b;
+            --accent: #1d9bf0;
+            --border: #2f3336;
+            --accepted: #00ba7c;
+            --proposed: #ffd400;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        header {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .count {
+            color: var(--text-sub);
+            font-size: 14px;
+        }
+
+        .adr-feed {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tweet {
+            display: flex;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            transition: background-color 0.2s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .tweet:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .tweet.placeholder {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--accent), #7856ff);
+            margin-right: 12px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .avatar.empty {
+            background: var(--border);
+        }
+
+        .content {
+            flex-grow: 1;
+        }
+
+        .meta {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+
+        .title {
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .id {
+            color: var(--text-sub);
+            font-size: 14px;
+        }
+
+        .status {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            margin-left: auto;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-accepted {
+            background-color: rgba(0, 186, 124, 0.1);
+            color: var(--accepted);
+            border: 1px solid var(--accepted);
+        }
+
+        .status-proposed {
+            background-color: rgba(255, 212, 0, 0.1);
+            color: var(--proposed);
+            border: 1px solid var(--proposed);
+        }
+
+        .body {
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            word-wrap: break-word;
+        }
+
+        .footer {
+            display: flex;
+            color: var(--text-sub);
+            font-size: 13px;
+        }
+
+        .action {
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>SmartIME ADR Timeline</h1>
+            <span class="count">18 / 30 slots filled</span>
+        </header>
+        <div class="adr-feed">
+
+            <!-- ADR 0001 -->
+            <a href="./ADR/Adr0001CoreLanguageChoice.md" class="tweet">
+                <div class="avatar">Core</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Core Language Choice</span>
+                        <span class="id">@Adr0001</span>
+                        <span class="status status-accepted">Accepted</span>
+                    </div>
+                    <div class="body">コアにRustを採用。Win(C++)、Android(Kotlin/JNI)、ブラウザ(WASM)で共通ロジックを共有し、メモリ安全かつ高性能な基盤を実現する。
+                    </div>
+                    <div class="footer">
+                        <div class="action">Architecture</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0002 -->
+            <a href="./ADR/Adr0002PostDetectionInput.md" class="tweet">
+                <div class="avatar">Input</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Post-Detection Input Model</span>
+                        <span class="id">@Adr0002</span>
+                        <span class="status status-accepted">Accepted</span>
+                    </div>
+                    <div class="body">「打つ前にモードを決める」常識を捨て、全入力をローマ字で受理。確定後にAIが意図（CLI/日本語等）を判定し最適に変換する事後判定モデル。</div>
+                    <div class="footer">
+                        <div class="action">Paradigm</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0003 -->
+            <a href="./ADR/Adr0003OfflineConstraint.md" class="tweet">
+                <div class="avatar">Off</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Offline Constraint</span>
+                        <span class="id">@Adr0003</span>
+                        <span class="status status-accepted">Accepted</span>
+                    </div>
+                    <div class="body">プライバシー、速度、可用性の観点から完全オフラインを厳守。モデルサイズを30-50MBに抑え、10ms以内の低レイテンシ推論をCPUのみで達成。</div>
+                    <div class="footer">
+                        <div class="action">Privacy</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0004 -->
+            <a href="./ADR/Adr0004MorphologicalEngineSelection.md" class="tweet">
+                <div class="avatar">NLP</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Morphological Engine Selection</span>
+                        <span class="id">@Adr0004</span>
+                        <span class="status status-proposed">Proposed</span>
+                    </div>
+                    <div class="body">日本語構造解析にMeCabを採用。単なる変換機ではなく、助詞や文末の出現確率を数値化し、日本語らしさを評価する「確率評価器」として活用。</div>
+                    <div class="footer">
+                        <div class="action">NLP</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0005 -->
+            <a href="./ADR/Adr0005AssistanceModes.md" class="tweet">
+                <div class="avatar">Mode</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Assistance Modes</span>
+                        <span class="id">@Adr0005</span>
+                        <span class="status status-proposed">Proposed</span>
+                    </div>
+                    <div class="body">ユーザーに主導権を渡す3モード（Manual, Assisted, Auto）を実装。過剰な自動確定を防ぎ、システムが思考の邪魔をしない段階的支援を行う。
+                    </div>
+                    <div class="footer">
+                        <div class="action">UX</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0006 -->
+            <a href="./ADR/Adr0006TypoTolerance.md" class="tweet">
+                <div class="avatar">Typo</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Typo Tolerance</span>
+                        <span class="id">@Adr0006</span>
+                        <span class="status status-proposed">Proposed</span>
+                    </div>
+                    <div class="body">編集距離とキー配列に基づき1-2文字の誤字を許容。母音脱落や子音重複を「間違い」ではなく「意図」として汲み取り、思考を止めない入力を実現。</div>
+                    <div class="footer">
+                        <div class="action">Correction</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0007 -->
+            <a href="./ADR/Adr0007CommandDiscovery.md" class="tweet">
+                <div class="avatar">Cmd</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Command Discovery</span>
+                        <span class="id">@Adr0007</span>
+                        <span class="status status-proposed">Proposed</span>
+                    </div>
+                    <div class="body">CLI特有の構造（ハイフン、パス、予約語等）をパターン認識で特定。自然文混在時でもコマンド部分を誤って日本語変換しないための判別ロジック。</div>
+                    <div class="footer">
+                        <div class="action">CLI</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0008 -->
+            <a href="./ADR/Adr0008LocalLearning.md" class="tweet">
+                <div class="avatar">Learn</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Local Learning</span>
+                        <span class="id">@Adr0008</span>
+                        <span class="status status-proposed">Proposed</span>
+                    </div>
+                    <div class="body">ユーザー個別の修正履歴や語彙を「Personal Delta」としてローカル学習。使い込むほどに個人の癖に適応し、自分専用の効率的な入力器へと深化。</div>
+                    <div class="footer">
+                        <div class="action">Personalization</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0009 -->
+            <a href="./ADR/Adr0009PlatformAdapters.md" class="tweet">
+                <div class="avatar">Adap</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Platform Adapters</span>
+                        <span class="id">@Adr0009</span>
+                        <span class="status status-accepted">Accepted</span>
+                    </div>
+                    <div class="body">OS固有制約に対応するためWin(TSF)、Android(IME
+                        Service)、Browser(Ext/WASM)の各アダプターを構築。共通Rustコアとブリッジ統合。</div>
+                    <div class="footer">
+                        <div class="action">Integration</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0010 -->
+            <a href="./ADR/Adr0010LightweightInferenceStrategy.md" class="tweet">
+                <div class="avatar">SLM</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Lightweight Inference Strategy</span>
+                        <span class="id">@Adr0010</span>
+                        <span class="status status-proposed">Proposed</span>
+                    </div>
+                    <div class="body">超低レイテンシ推論のため量子化された統計モデルを採用。30-50MBの軽量バイナリで、ハイスペックなハードなしに高精度な意図判定をCPUで実行。</div>
+                    <div class="footer">
+                        <div class="action">Performance</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0011 -->
+            <a href="./ADR/Adr0011DataStructuresForOfflineSearch.md" class="tweet">
+                <div class="avatar">Data</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Data Structures for Offline Search</span>
+                        <span class="id">@Adr0011</span>
+                        <span class="status status-proposed">Proposed</span>
+                    </div>
+                    <div class="body">TrieによるO(k)高速検索とBloom Filterによる存在判定を導入。辞書の肥大化に依存しない反応速度と、無駄な解析の早期遮断により打鍵に追従。</div>
+                    <div class="footer">
+                        <div class="action">Engine</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0012 -->
+            <a href="./ADR/Adr0012PhasedImplementationStrategy.md" class="tweet">
+                <div class="avatar">Phase</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Phased Implementation Strategy</span>
+                        <span class="id">@Adr0012</span>
+                        <span class="status status-accepted">Accepted</span>
+                    </div>
+                    <div class="body">実装を3段階（判別変換、文脈補正、意味補完学習）に分離。開発リスクを抑えつつ、まずは「事後判定」によるモードレスな快適さを早期実現。</div>
+                    <div class="footer">
+                        <div class="action">Roadmap</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0013 -->
+            <a href="./ADR/Adr0013LocalSlmAsIntentClassifier.md" class="tweet">
+                <div class="avatar">Router</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Local SLM as Intent Classifier</span>
+                        <span class="id">@Adr0013</span>
+                        <span class="status status-accepted">Accepted</span>
+                    </div>
+                    <div class="body">局所言語モデルを「意図ルーター」として採用。入力の「日本語らしさ」をリアルタイムで確率評価し、CLIとの混在をシームレスに自動処理。</div>
+                    <div class="footer">
+                        <div class="action">AI</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0014 -->
+            <a href="./ADR/Adr0014DiscriminatorProcessorSeparation.md" class="tweet">
+                <div class="avatar">Dual</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Discriminator-Processor Separation</span>
+                        <span class="id">@Adr0014</span>
+                        <span class="status status-accepted">Accepted</span>
+                    </div>
+                    <div class="body">高速な「判別機（Disc）」と専門的な「処理機（Proc）」に分離。判別機でブロックを切り分け、各専門処理機が変換・補正・補完などを効率的に分担。</div>
+                    <div class="footer">
+                        <div class="action">Architecture</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0015 -->
+            <a href="./ADR/Adr0015HybridDictionaryAndModelStrategy.md" class="tweet">
+                <div class="avatar">Hyb</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Hybrid Dictionary and Model Strategy</span>
+                        <span class="id">@Adr0015</span>
+                        <span class="status status-proposed">Proposed</span>
+                    </div>
+                    <div class="body">静的辞書(Trie)と動的推論(SLM)のハイブリッド。既知の語彙は高速検索し、未知語や誤字はモデルで補うことで、絶対的速度と柔軟な解釈を両立。</div>
+                    <div class="footer">
+                        <div class="action">Strategy</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0016 -->
+            <a href="./ADR/Adr0016LayeredDictionaryPartitioning.md" class="tweet">
+                <div class="avatar">Layer</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Layered Dictionary Partitioning</span>
+                        <span class="id">@Adr0016</span>
+                        <span class="status status-accepted">Accepted</span>
+                    </div>
+                    <div class="body">辞書をSystem(静的)、Domain(専門)、Personal
+                        Delta(個人)の3層に分割。更新性とプライバシーを両立し、個人データを安全な秘密の庭として隔離。</div>
+                    <div class="footer">
+                        <div class="action">Data</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0017 -->
+            <a href="./ADR/Adr0017MemoryMappedZeroCopyStorage.md" class="tweet">
+                <div class="avatar">Mmap</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Memory-Mapped Zero-Copy Storage</span>
+                        <span class="id">@Adr0017</span>
+                        <span class="status status-accepted">Accepted</span>
+                    </div>
+                    <div class="body">mmapによるゼロコピー・アクセスを導入。起動時のデシリアライズを排除し、必要なページだけを動的にロード。極限のメモリ節約と高速起動を実現。</div>
+                    <div class="footer">
+                        <div class="action">Low-Level</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- ADR 0018 -->
+            <a href="./ADR/Adr0018CorpusMetabolismMechanism.md" class="tweet">
+                <div class="avatar">Bio</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Corpus Metabolism Mechanism</span>
+                        <span class="id">@Adr0018</span>
+                        <span class="status status-proposed">Proposed</span>
+                    </div>
+                    <div class="body">語彙の「新陳代謝」サイクルを実装。短期記憶から長期記憶への定着、および低頻度語のパージを自律的に行い、常に最適化された辞書状態を維持。</div>
+                    <div class="footer">
+                        <div class="action">Evolution</div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Placeholder Slots (19-30) -->
+            <div class="tweet placeholder">
+                <div class="avatar empty">??</div>
+                <div class="content">
+                    <div class="meta">
+                        <span class="title">Next Decision Pending...</span>
+                        <span class="id">@Adr0019</span>
+                    </div>
+                    <div class="body">Evaluating future requirements and implementation details.</div>
+                </div>
+            </div>
+            <div class="tweet placeholder">
+                <div class="avatar empty">??</div>
+                <div class="content">
+                    <div class="meta"><span class="title">Reserved</span><span class="id">@Adr0020</span></div>
+                    <div class="body">...</div>
+                </div>
+            </div>
+            <div class="tweet placeholder">
+                <div class="avatar empty">??</div>
+                <div class="content">
+                    <div class="meta"><span class="title">Reserved</span><span class="id">@Adr0021</span></div>
+                    <div class="body">...</div>
+                </div>
+            </div>
+            <div class="tweet placeholder">
+                <div class="avatar empty">??</div>
+                <div class="content">
+                    <div class="meta"><span class="title">Reserved</span><span class="id">@Adr0022</span></div>
+                    <div class="body">...</div>
+                </div>
+            </div>
+            <div class="tweet placeholder">
+                <div class="avatar empty">??</div>
+                <div class="content">
+                    <div class="meta"><span class="title">Reserved</span><span class="id">@Adr0023</span></div>
+                    <div class="body">...</div>
+                </div>
+            </div>
+            <div class="tweet placeholder">
+                <div class="avatar empty">??</div>
+                <div class="content">
+                    <div class="meta"><span class="title">Reserved</span><span class="id">@Adr0024</span></div>
+                    <div class="body">...</div>
+                </div>
+            </div>
+            <div class="tweet placeholder">
+                <div class="avatar empty">??</div>
+                <div class="content">
+                    <div class="meta"><span class="title">Reserved</span><span class="id">@Adr0025</span></div>
+                    <div class="body">...</div>
+                </div>
+            </div>
+            <div class="tweet placeholder">
+                <div class="avatar empty">??</div>
+                <div class="content">
+                    <div class="meta"><span class="title">Reserved</span><span class="id">@Adr0026</span></div>
+                    <div class="body">...</div>
+                </div>
+            </div>
+            <div class="tweet placeholder">
+                <div class="avatar empty">??</div>
+                <div class="content">
+                    <div class="meta"><span class="title">Reserved</span><span class="id">@Adr0027</span></div>
+                    <div class="body">...</div>
+                </div>
+            </div>
+            <div class="tweet placeholder">
+                <div class="avatar empty">??</div>
+                <div class="content">
+                    <div class="meta"><span class="title">Reserved</span><span class="id">@Adr0028</span></div>
+                    <div class="body">...</div>
+                </div>
+            </div>
+            <div class="tweet placeholder">
+                <div class="avatar empty">??</div>
+                <div class="content">
+                    <div class="meta"><span class="title">Reserved</span><span class="id">@Adr0029</span></div>
+                    <div class="body">...</div>
+                </div>
+            </div>
+            <div class="tweet placeholder">
+                <div class="avatar empty">??</div>
+                <div class="content">
+                    <div class="meta"><span class="title">Reserved</span><span class="id">@Adr0030</span></div>
+                    <div class="body">...</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

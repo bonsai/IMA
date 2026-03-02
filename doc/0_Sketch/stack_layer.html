@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartIME Stack Layers</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --accent: #1d9bf0;
+            --accent-glow: rgba(29, 155, 240, 0.3);
+            --layer-bg: rgba(255, 255, 255, 0.03);
+            --layer-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f0f0f0;
+            --text-sub: #a0a0a0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 3rem;
+            margin-top: 50px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            background: linear-gradient(to bottom, #fff, #666);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-sub);
+            margin-bottom: 60px;
+            font-size: 1.1rem;
+        }
+
+        .scene {
+            width: 1000px;
+            height: 800px;
+            perspective: 2000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stack {
+            width: 600px;
+            height: 450px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(50deg) rotateZ(-30deg);
+            transition: transform 0.5s ease;
+        }
+
+        .stack:hover {
+            transform: rotateX(55deg) rotateZ(-25deg);
+        }
+
+        .layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--layer-bg);
+            border: 1px solid var(--layer-border);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            box-sizing: border-box;
+            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.5s;
+            cursor: pointer;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .layer:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 30px var(--accent-glow);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Distribution of layers in 3D space */
+        .layer-1 {
+            transform: translateZ(280px);
+            border-left: 4px solid #ff4b2b;
+        }
+
+        /* User Input */
+        .layer-2 {
+            transform: translateZ(210px);
+            border-left: 4px solid #1d9bf0;
+        }
+
+        /* Intent Discriminator */
+        .layer-3 {
+            transform: translateZ(140px);
+            border-left: 4px solid #00ba7c;
+        }
+
+        /* Processors */
+        .layer-4 {
+            transform: translateZ(70px);
+            border-left: 4px solid #ffd400;
+        }
+
+        /* Dictionary */
+        .layer-5 {
+            transform: translateZ(0px);
+            border-left: 4px solid #7856ff;
+        }
+
+        /* Platform Adapters */
+        .layer-6 {
+            transform: translateZ(-70px);
+            border-left: 4px solid #444;
+        }
+
+        /* OS/Hardware */
+
+        .layer-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .layer-id {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            font-weight: 300;
+        }
+
+        .layer-description {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            color: var(--text-sub);
+            max-width: 80%;
+        }
+
+        .tags {
+            margin-top: auto;
+            display: flex;
+            gap: 8px;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .indicator {
+            position: absolute;
+            right: -150px;
+            top: 50%;
+            transform: translateY(-50%) rotateZ(30deg) rotateX(-50deg);
+            width: 200px;
+            text-align: left;
+            pointer-events: none;
+        }
+
+        .indicator-line {
+            width: 100px;
+            height: 1px;
+            background: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateZ(var(--z)) translateY(0px);
+            }
+
+            50% {
+                transform: translateZ(var(--z)) translateY(-10px);
+            }
+
+            100% {
+                transform: translateZ(var(--z)) translateY(0px);
+            }
+        }
+
+        .layer {
+            --z: 0px;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .layer-1 {
+            --z: 280px;
+            animation-delay: 0s;
+        }
+
+        .layer-2 {
+            --z: 210px;
+            animation-delay: 0.5s;
+        }
+
+        .layer-3 {
+            --z: 140px;
+            animation-delay: 1s;
+        }
+
+        .layer-4 {
+            --z: 70px;
+            animation-delay: 1.5s;
+        }
+
+        .layer-5 {
+            --z: 0px;
+            animation-delay: 2s;
+        }
+
+        .layer-6 {
+            --z: -70px;
+            animation-delay: 2.5s;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Technical Stack Layers</h1>
+    <p class="subtitle">SmartIME Architecture Visualization</p>
+
+    <div class="scene">
+        <div class="stack">
+
+            <!-- Layer 1: User Experience -->
+            <div class="layer layer-1">
+                <div class="layer-title">
+                    User Interface Layer
+                    <span class="layer-id">LEVEL 05</span>
+                </div>
+                <div class="layer-description">
+                    Raw Romaji Input. Universal text capture without pre-selection.
+                    Real-time visual feedback and candidates.
+                </div>
+                <div class="tags">
+                    <span class="tag">UX</span>
+                    <span class="tag">Zero friction</span>
+                </div>
+            </div>
+
+            <!-- Layer 2: Intent Recognition -->
+            <div class="layer layer-2">
+                <div class="layer-title">
+                    Intent Discriminator
+                    <span class="layer-id">LEVEL 04</span>
+                </div>
+                <div class="layer-description">
+                    Local SLM & Intent Router. Classifies streams into JP, CLI, or EN
+                    probabilities in less than 2ms.
+                </div>
+                <div class="tags">
+                    <span class="tag">Local SLM</span>
+                    <span class="tag">Rust Core</span>
+                </div>
+            </div>
+
+            <!-- Layer 3: Processing -->
+            <div class="layer layer-3">
+                <div class="layer-title">
+                    Semantic Processors
+                    <span class="layer-id">LEVEL 03</span>
+                </div>
+                <div class="layer-description">
+                    Specialized engines for Japanese conversion, CLI completion,
+                    and typo-tolerant reconstruction.
+                </div>
+                <div class="tags">
+                    <span class="tag">MeCab</span>
+                    <span class="tag">Levenshtein</span>
+                </div>
+            </div>
+
+            <!-- Layer 4: Knowledge -->
+            <div class="layer layer-4">
+                <div class="layer-title">
+                    Dictionary & World
+                    <span class="layer-id">LEVEL 02</span>
+                </div>
+                <div class="layer-description">
+                    Layered knowledge base: System, Domain, and Personal Delta.
+                    Corpus metabolism for self-optimization.
+                </div>
+                <div class="tags">
+                    <span class="tag">Double-Array Trie</span>
+                    <span class="tag">Personal Delta</span>
+                </div>
+            </div>
+
+            <!-- Layer 5: Bridge -->
+            <div class="layer layer-5">
+                <div class="layer-title">
+                    Platform Adapters
+                    <span class="layer-id">LEVEL 01</span>
+                </div>
+                <div class="layer-description">
+                    Native bridges to OS specific APIs (TSF, IME Service, WASM).
+                    Seamless integration with host environments.
+                </div>
+                <div class="tags">
+                    <span class="tag">Win TSF</span>
+                    <span class="tag">Android NDK</span>
+                    <span class="tag">WASM</span>
+                </div>
+            </div>
+
+            <!-- Layer 6: Hardware -->
+            <div class="layer layer-6">
+                <div class="layer-title">
+                    Infrastructure
+                    <span class="layer-id">SYSTEM</span>
+                </div>
+                <div class="layer-description">
+                    Local CPU inference. Memory-mapped zero-copy access.
+                    Guaranteed privacy and offline execution.
+                </div>
+                <div class="tags">
+                    <span class="tag">mmap</span>
+                    <span class="tag">SIMD</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Interactive tilt effect (optional, keep it simple for now)
+    </script>
+</body>
+
+</html>
