@@ -24,3 +24,7 @@ This directory contains Architecture Decision Records (ADRs) for the SmartIME pr
 | [Adr0018](file:///c:/Users/dance/zone/vibe/IME3/doc/3_Solution/ADR/Adr0018CorpusMetabolismMechanism.md) | **Corpus Metabolism Mechanism**<br>`Proposed` | 語彙の「新陳代謝」サイクルを実装。短期記憶から長期記憶への定着、および低頻度語のパージを自律的に行い、常に最適化された辞書状態を維持。 |
 | [Adr0019](file:///c:/Users/dance/zone/vibe/IME3/doc/3_Solution/ADR/Adr0019HighPerformanceAndPersonalizationOptimization.md) | **High Performance and Personalization Optimization**<br>`Proposed` | Personal Deltaの動的同期、Rustによる全プラットフォーム抽象レイヤーの統一、SIMD/mmapによる極限の高速化を導入し、遅延ゼロのパーソナライズ体験を実現。 |
 | [Adr0020](file:///c:/Users/dance/zone/vibe/IME3/doc/3_Solution/ADR/Adr0020ClipboardOneClickPaste.md) | **Clipboard One-Click Paste**<br>`Proposed` | クリップボード内の画像を1ボタン（またはCtrl+V）で即座にNDLOCR-Lite Webへ貼り付け、OCR処理を開始する「摩擦ゼロ」の入力体験を定義。 |
+
+| [Adr0021](Adr0021_CSharpWpfUiForConfiguration.md) | **C# UI for Configuration**<br>`Proposed` | Windows向け設定UIにC# (WPF)を採用。RustコアとはFFI (P/Invoke)で連携し、UI開発の生産性とパフォーマンスを両立する。 |
+| [Adr0022](Adr0022_DatabaseSelectionForPersonalDelta.md) | **Database for Personal Delta**<br>`Proposed` | 個人学習データ(Personal Delta)の永続化にSQLite、高速キャッシュに純Rust製KVストア(redb)を併用するハイブリッド戦略を採用。 |
+| [Adr0023](Adr0023_MlStrategyForIntentClassification.md) | **ML Strategy for Classification**<br>`Proposed` | 意図分類のML戦略として、形態素解析に純Rust製・高速な「Vibrato」、推論エンジンに純Rust製ONNXランタイム「Tract」を採用する。 |
